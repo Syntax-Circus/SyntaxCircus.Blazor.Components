@@ -32,7 +32,7 @@ Use the host's local `/not-found` page as the router adapter:
 </NotFoundView>
 ```
 
-`ChildContent` replaces the default description. `ActionsContent` replaces the default home link. `MediaContent` is rendered above the heading and accepts an image, SVG, or any host-provided template. Provide appropriate alternative text for meaningful media; decorative media should be hidden from assistive technology by the host markup.
+`HeaderContent` replaces the default heading, `ChildContent` replaces the default description, and `ActionsContent` replaces the default home link. Set `ShowDefaultActions="false"` when the host renders navigation elsewhere. `MediaContent` is rendered above the heading and accepts an image, SVG, or any host-provided template. Provide appropriate alternative text for meaningful media; decorative media should be hidden from assistive technology by the host markup.
 
 Configure the host router with the adapter page:
 

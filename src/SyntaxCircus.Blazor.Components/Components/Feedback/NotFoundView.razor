@@ -1,6 +1,6 @@
 @namespace SyntaxCircus.Blazor.Components.Feedback
 
-<section class="@CssClass" aria-labelledby="@HeadingId">
+<section class="@CssClass" aria-labelledby="@(HeaderContent is null ? HeadingId : null)">
     @if (MediaContent is not null)
     {
         <div data-not-found-media>
@@ -8,7 +8,14 @@
         </div>
     }
 
-    <h1 id="@HeadingId">@Title</h1>
+    @if (HeaderContent is not null)
+    {
+        @HeaderContent
+    }
+    else
+    {
+        <h1 id="@HeadingId">@Title</h1>
+    }
 
     @if (ChildContent is not null)
     {
@@ -25,7 +32,7 @@
             @ActionsContent
         </div>
     }
-    else if (!string.IsNullOrWhiteSpace(HomeHref))
+    else if (ShowDefaultActions && !string.IsNullOrWhiteSpace(HomeHref))
     {
         <p>
             <a href="@HomeHref">@HomeLabel</a>
@@ -55,8 +62,14 @@
     public RenderFragment? MediaContent { get; set; }
 
     [Parameter]
+    public RenderFragment? HeaderContent { get; set; }
+
+    [Parameter]
     public RenderFragment? ChildContent { get; set; }
 
     [Parameter]
     public RenderFragment? ActionsContent { get; set; }
+
+    [Parameter]
+    public bool ShowDefaultActions { get; set; } = true;
 }
