@@ -1,0 +1,62 @@
+@namespace SyntaxCircus.Blazor.Components.Feedback
+
+<section class="@CssClass" aria-labelledby="@HeadingId">
+    @if (MediaContent is not null)
+    {
+        <div data-not-found-media>
+            @MediaContent
+        </div>
+    }
+
+    <h1 id="@HeadingId">@Title</h1>
+
+    @if (ChildContent is not null)
+    {
+        @ChildContent
+    }
+    else if (!string.IsNullOrWhiteSpace(Description))
+    {
+        <p>@Description</p>
+    }
+
+    @if (ActionsContent is not null)
+    {
+        <div data-not-found-actions>
+            @ActionsContent
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(HomeHref))
+    {
+        <p>
+            <a href="@HomeHref">@HomeLabel</a>
+        </p>
+    }
+</section>
+
+@code {
+    private readonly string HeadingId = $"not-found-{Guid.NewGuid():N}";
+
+    [Parameter]
+    public string Title { get; set; } = "Page not found";
+
+    [Parameter]
+    public string? Description { get; set; } = "The page you requested could not be found.";
+
+    [Parameter]
+    public string? HomeHref { get; set; } = "/";
+
+    [Parameter]
+    public string HomeLabel { get; set; } = "Go home";
+
+    [Parameter]
+    public string CssClass { get; set; } = "syntax-circus-not-found";
+
+    [Parameter]
+    public RenderFragment? MediaContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? ActionsContent { get; set; }
+}
