@@ -1,7 +1,5 @@
+using Bunit;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web.HtmlRendering;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging.Abstractions;
 using Shouldly;
 using SyntaxCircus.Blazor.Components.Feedback;
 using Xunit;
@@ -11,9 +9,10 @@ namespace SyntaxCircus.Blazor.Components.Tests;
 public sealed class NotFoundViewTests
 {
     [Fact]
-    public async Task RenderAsync_WithoutParameters_RendersAccessibleDefaults()
+    public void Render_WithoutParameters_RendersAccessibleDefaults()
     {
-        var markup = await RenderAsync([]);
+        using var context = new BunitContext();
+        var markup = context.Render<NotFoundView>().Markup;
 
         markup.ShouldContain("class=\"syntax-circus-not-found\"");
         markup.ShouldContain("<h1");
@@ -23,18 +22,18 @@ public sealed class NotFoundViewTests
     }
 
     [Fact]
-    public async Task RenderAsync_WithContentSlots_RendersSlotsInsteadOfDefaultBodyAndActions()
+    public void Render_WithContentSlots_RendersSlotsInsteadOfDefaultBodyAndActions()
     {
+        using var context = new BunitContext();
         RenderFragment media = builder => builder.AddContent(0, "Illustration");
         RenderFragment body = builder => builder.AddContent(0, "Custom explanation");
         RenderFragment actions = builder => builder.AddContent(0, "Custom action");
-        var markup = await RenderAsync(new Dictionary<string, object?>
-        {
-            [nameof(NotFoundView.Title)] = "Missing record",
-            [nameof(NotFoundView.MediaContent)] = media,
-            [nameof(NotFoundView.ChildContent)] = body,
-            [nameof(NotFoundView.ActionsContent)] = actions,
-        });
+        var markup = context.Render<NotFoundView>(parameters => parameters
+            .Add(component => component.Title, "Missing record")
+            .Add(component => component.MediaContent, media)
+            .Add(component => component.ChildContent, body)
+            .Add(component => component.ActionsContent, actions))
+            .Markup;
 
         markup.ShouldContain("data-not-found-media");
         markup.ShouldContain("Illustration");
@@ -44,18 +43,5 @@ public sealed class NotFoundViewTests
         markup.ShouldContain("Custom action");
         markup.ShouldNotContain("The page you requested could not be found.");
         markup.ShouldNotContain(">Go home</a>");
-    }
-
-    private static async Task<string> RenderAsync(IReadOnlyDictionary<string, object?> parameters)
-    {
-        var services = new ServiceCollection();
-        await using var provider = services.BuildServiceProvider();
-        await using var renderer = new HtmlRenderer(provider, NullLoggerFactory.Instance);
-
-        return await renderer.Dispatcher.InvokeAsync(async () =>
-        {
-            var output = await renderer.RenderComponentAsync<NotFoundView>(ParameterView.FromDictionary(parameters));
-            return output.ToHtmlString();
-        });
     }
 }
