@@ -14,7 +14,8 @@ This is a small `net10.0` Razor component library. It is:
 - intentionally limited to reusable component markup and behavior.
 
 It is not an application framework. Do not add application layouts, CSS
-frameworks, static images, JavaScript, service registration, router wrappers,
+frameworks, static images, JavaScript (except the documented `ReconnectModal`
+behavior module), service registration, router wrappers,
 HTTP middleware, SEO policy, authorization policy, or domain-specific copy
 without a separate, evidence-based design decision.
 
@@ -27,6 +28,8 @@ whether a resource exists, or choose authentication behavior.
 ```text
 src/SyntaxCircus.Blazor.Components/
   Components/Feedback/NotFoundView.razor  public not-found component
+  Components/Feedback/ReconnectModal.razor public reconnect component and behavior module
+  Components/Feedback/GlobalError*.razor  public recoverable error-boundary components
   _Imports.razor                           library-wide Razor imports
   SyntaxCircus.Blazor.Components.csproj    package metadata and pack settings
 
@@ -60,7 +63,7 @@ commit. GitVersion is disabled only for NCrunch through
 ## Public API rules
 
 The namespace `SyntaxCircus.Blazor.Components.Feedback` and every public
-`NotFoundView` parameter are consumer API.
+component parameter are consumer API.
 
 - Treat renames, removals, type changes, default changes, or changed slot
   precedence as breaking changes.
@@ -71,7 +74,9 @@ The namespace `SyntaxCircus.Blazor.Components.Feedback` and every public
 - Use replacement slots for genuinely varying host markup. Do not add a
   parameter solely to encode one application’s branding.
 - Require evidence from at least two concrete consumer styles before adding a
-  new component or widening a component contract.
+new component or widening a component contract.
+- `ReconnectModal` is the one intentional JavaScript exception: its module is limited to
+  standard Blazor circuit reconnect/retry/resume behavior. Keep its visuals host-owned.
 
 When public output changes, update all of the following in the same change:
 

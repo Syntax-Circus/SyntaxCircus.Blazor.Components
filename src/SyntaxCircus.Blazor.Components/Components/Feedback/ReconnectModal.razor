@@ -1,0 +1,120 @@
+@namespace SyntaxCircus.Blazor.Components.Feedback
+
+<script type="module" src="@Assets["_content/SyntaxCircus.Blazor.Components/Components/Feedback/ReconnectModal.razor.js"]"></script>
+
+<dialog id="components-reconnect-modal" class="@CssClass" data-nosnippet aria-labelledby="@HeadingId">
+    <div data-reconnect-state="first retrying">
+        @if (LoadingContent is not null)
+        {
+            @LoadingContent
+        }
+    </div>
+    <div id="@HeadingId" data-reconnect-state="first">
+        @if (FirstAttemptContent is not null)
+        {
+            @FirstAttemptContent
+        }
+        else
+        {
+            <p>Rejoining the server...</p>
+        }
+    </div>
+    <div data-reconnect-state="retrying">
+        @if (RetryingContent is not null)
+        {
+            @RetryingContent
+        }
+        else
+        {
+            <p>Rejoin failed. Trying again in <span id="components-seconds-to-next-attempt"></span> seconds.</p>
+        }
+    </div>
+    <div data-reconnect-state="failed">
+        @if (FailedContent is not null)
+        {
+            @FailedContent
+        }
+        else
+        {
+            <p>Failed to rejoin. Please retry or reload the page.</p>
+        }
+
+        @if (RetryActionContent is not null)
+        {
+            @RetryActionContent
+        }
+        else
+        {
+            <button type="button" data-reconnect-action="retry">Retry</button>
+        }
+    </div>
+    <div data-reconnect-state="paused">
+        @if (PausedContent is not null)
+        {
+            @PausedContent
+        }
+        else
+        {
+            <p>The session has been paused by the server.</p>
+        }
+
+        @if (ResumeActionContent is not null)
+        {
+            @ResumeActionContent
+        }
+        else
+        {
+            <button type="button" data-reconnect-action="resume">Resume</button>
+        }
+    </div>
+    <div data-reconnect-state="resume-failed">
+        @if (ResumeFailedContent is not null)
+        {
+            @ResumeFailedContent
+        }
+        else
+        {
+            <p>Failed to resume the session. Please retry or reload the page.</p>
+        }
+
+        @if (ResumeActionContent is not null)
+        {
+            @ResumeActionContent
+        }
+        else
+        {
+            <button type="button" data-reconnect-action="resume">Resume</button>
+        }
+    </div>
+</dialog>
+
+@code {
+    private readonly string HeadingId = $"reconnect-{Guid.NewGuid():N}";
+
+    [Parameter]
+    public string CssClass { get; set; } = "syntax-circus-reconnect-modal";
+
+    [Parameter]
+    public RenderFragment? LoadingContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? FirstAttemptContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? RetryingContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? FailedContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? PausedContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? ResumeFailedContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? RetryActionContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? ResumeActionContent { get; set; }
+}

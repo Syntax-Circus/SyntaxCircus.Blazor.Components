@@ -1,0 +1,24 @@
+@namespace SyntaxCircus.Blazor.Components.Feedback
+
+<LoggingErrorBoundary @ref="errorBoundary" BoundaryName="@BoundaryName">
+    <ChildContent>
+        <div @key="renderVersion">
+            @ChildContent
+        </div>
+    </ChildContent>
+    <ErrorContent Context="exception">
+        <GlobalErrorView Title="@Title"
+                         Description="@Description"
+                         RetryLabel="@RetryLabel"
+                         HomeHref="@HomeHref"
+                         HomeLabel="@HomeLabel"
+                         CssClass="@CssClass"
+                         Exception="@exception"
+                         HeaderContent="@HeaderContent"
+                         ActionsContent="@ActionsContent"
+                         ExceptionContent="@ExceptionContent"
+                         OnRetry="RecoverAsync">
+            @ErrorBodyContent
+        </GlobalErrorView>
+    </ErrorContent>
+</LoggingErrorBoundary>

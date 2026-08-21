@@ -1,0 +1,86 @@
+@namespace SyntaxCircus.Blazor.Components.Feedback
+
+<section class="@CssClass" role="alert" aria-labelledby="@(HeaderContent is null ? HeadingId : null)">
+    @if (HeaderContent is not null)
+    {
+        @HeaderContent
+    }
+    else
+    {
+        <h1 id="@HeadingId">@Title</h1>
+    }
+
+    @if (ChildContent is not null)
+    {
+        @ChildContent
+    }
+    else if (!string.IsNullOrWhiteSpace(Description))
+    {
+        <p>@Description</p>
+    }
+
+    @if (ExceptionContent is not null && Exception is not null)
+    {
+        <div data-global-error-details>
+            @ExceptionContent(Exception)
+        </div>
+    }
+
+    @if (ActionsContent is not null)
+    {
+        <div data-global-error-actions>
+            @ActionsContent
+        </div>
+    }
+    else
+    {
+        <div data-global-error-actions>
+            <button type="button" @onclick="OnRetry">@RetryLabel</button>
+
+            @if (!string.IsNullOrWhiteSpace(HomeHref))
+            {
+                <a href="@HomeHref">@HomeLabel</a>
+            }
+        </div>
+    }
+</section>
+
+@code {
+    private readonly string HeadingId = $"global-error-{Guid.NewGuid():N}";
+
+    [Parameter]
+    public string Title { get; set; } = "We hit an unexpected snag.";
+
+    [Parameter]
+    public string? Description { get; set; } = "Something went wrong rendering this screen. Try again to recover without reloading.";
+
+    [Parameter]
+    public string RetryLabel { get; set; } = "Try again";
+
+    [Parameter]
+    public string? HomeHref { get; set; } = "/";
+
+    [Parameter]
+    public string HomeLabel { get; set; } = "Go home";
+
+    [Parameter]
+    public string CssClass { get; set; } = "syntax-circus-global-error";
+
+    [Parameter]
+    public Exception? Exception { get; set; }
+
+    [Parameter]
+    public EventCallback OnRetry { get; set; }
+
+    [Parameter]
+    public RenderFragment? HeaderContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? ActionsContent { get; set; }
+
+    [Parameter]
+    public RenderFragment<Exception>? ExceptionContent { get; set; }
+}

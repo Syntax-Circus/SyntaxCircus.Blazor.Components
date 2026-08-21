@@ -25,6 +25,11 @@ No service registration, JavaScript, CSS import, or middleware registration is r
 | Component | Namespace | Purpose |
 |---|---|---|
 | `NotFoundView` | `SyntaxCircus.Blazor.Components.Feedback` | Accessible, customizable markup for a not-found experience. |
+| `ReconnectModal` | `SyntaxCircus.Blazor.Components.Feedback` | Extensible Blazor Server circuit reconnect UI and behavior. |
+| `LoggingErrorBoundary` | `SyntaxCircus.Blazor.Components.Feedback` | Blazor error boundary that logs unhandled render failures. |
+| `GlobalErrorBoundary` | `SyntaxCircus.Blazor.Components.Feedback` | Recoverable, customizable application error boundary. |
+| `GlobalErrorView` | `SyntaxCircus.Blazor.Components.Feedback` | Presentation-only fallback view for a rendering failure. |
+| `ReconnectModal` | `SyntaxCircus.Blazor.Components.Feedback` | Extensible Blazor Server circuit reconnect UI and behavior. |
 
 ## `NotFoundView`
 
@@ -90,6 +95,62 @@ Use a slot when the host needs richer markup. Do not duplicate the default regio
 ```
 
 Because `ActionsContent` is present, the generated “Go home” link is not rendered.
+
+## `ReconnectModal`
+
+`ReconnectModal` supplies the standard Blazor Server reconnect, retry, pause, resume, and rejected-circuit behavior. Render it once in the host page body before `blazor.web.js`:
+
+```razor
+@using SyntaxCircus.Blazor.Components.Feedback
+
+<Routes />
+<ReconnectModal CssClass="my-product-reconnect" />
+<script src="@Assets["_framework/blazor.web.js"]"></script>
+```
+
+The component deliberately supplies no visual CSS. Style `CssClass` and the stable `data-reconnect-state` regions in the host application. It uses a native `dialog`, so hosts should define the dialog surface, backdrop, spacing, contrast, focus treatment, and motion behavior for their design system.
+
+### Public parameters
+
+| Parameter | Type | Default | Behavior |
+|---|---|---|---|
+| `CssClass` | `string` | `"syntax-circus-reconnect-modal"` | Class applied to the dialog. |
+| `LoadingContent` | `RenderFragment?` | `null` | Optional content shown during first and repeated reconnection attempts. |
+| `FirstAttemptContent` | `RenderFragment?` | `null` | Replaces the initial reconnect message. |
+| `RetryingContent` | `RenderFragment?` | `null` | Replaces the repeated-attempt message. Include `components-seconds-to-next-attempt` when showing the Blazor retry delay. |
+| `FailedContent` | `RenderFragment?` | `null` | Replaces the failed-reconnect message. |
+| `PausedContent` | `RenderFragment?` | `null` | Replaces the paused-session message. |
+| `ResumeFailedContent` | `RenderFragment?` | `null` | Replaces the failed-resume message. |
+| `RetryActionContent` | `RenderFragment?` | `null` | Replaces the retry action. Its interactive element must have `data-reconnect-action="retry"`. |
+| `ResumeActionContent` | `RenderFragment?` | `null` | Replaces the resume action in both paused states. Its interactive element must have `data-reconnect-action="resume"`. |
+
+Only one element with the `components-reconnect-modal` ID may exist in a rendered host. The component's JavaScript is limited to the standard Blazor circuit APIs and is loaded automatically with the component.
+
+## Error boundaries
+
+`LoggingErrorBoundary` is a standard Blazor `ErrorBoundary` that logs each unhandled rendering exception. `GlobalErrorBoundary` composes it with an accessible fallback, recovers when the user retries or navigates, and accepts the protected application content as `ChildContent`.
+
+```razor
+@using SyntaxCircus.Blazor.Components.Feedback
+
+<GlobalErrorBoundary BoundaryName="admin UI"
+                     CssClass="my-product-error"
+                     Title="We couldn't load this screen.">
+    <ChildContent>
+        <Routes />
+    </ChildContent>
+    <ActionsContent>
+        <button type="button">Try again</button>
+        <a href="/">Home</a>
+    </ActionsContent>
+</GlobalErrorBoundary>
+```
+
+`GlobalErrorView` may also be used directly when the host owns error detection and retry behavior. Both components retain these default parameters: `Title`, `Description`, `RetryLabel`, `HomeHref`, `HomeLabel`, and `CssClass`. `GlobalErrorBoundary` additionally exposes `BoundaryName`.
+
+`HeaderContent`, body content (`ChildContent` on the view and `ErrorBodyContent` on the boundary), and `ActionsContent` replace their default regions. `ExceptionContent` is a typed `RenderFragment<Exception>` and renders only when the host explicitly provides it; exception details never appear by default. Supply custom actions only when they preserve a clear recovery or navigation path.
+
+The components use semantic elements and stable `syntax-circus-global-error`/`data-global-error-*` hooks, but ship no visual CSS. Hosts provide theme, layout, focus, and responsive styling.
 
 ### Branded header and body
 
