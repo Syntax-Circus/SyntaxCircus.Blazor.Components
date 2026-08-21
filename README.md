@@ -1,5 +1,9 @@
 # SyntaxCircus.Blazor.Components
 
+[![Build](https://github.com/Syntax-Circus/SyntaxCircus.Blazor.Components/actions/workflows/build.yml/badge.svg)](https://github.com/Syntax-Circus/SyntaxCircus.Blazor.Components/actions/workflows/build.yml)
+[![NuGet](https://img.shields.io/nuget/v/SyntaxCircus.Blazor.Components.svg)](https://www.nuget.org/packages/SyntaxCircus.Blazor.Components)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.txt)
+
 Reusable, semantic Razor components for Blazor applications.
 
 The package is **Blazor/Razor-dependent** and targets `net10.0`, but is deliberately **UI/CSS-framework-agnostic**. It does not bring Bootstrap, Tailwind, stylesheets, a layout, a router, middleware, or a design system. A consuming application owns all of those choices.
@@ -340,3 +344,7 @@ The test suite covers default markup, replacement slots, and action suppression.
 Add a component only when it has a stable, UI/CSS-framework-agnostic contract and at least two concrete consumer styles. Keep application layouts, branding, routing, HTTP middleware, and CSS systems in host applications.
 
 See [AGENTS.md](AGENTS.md) for contributor and AI-agent guidance.
+
+## License
+
+MIT — see [LICENSE.txt](LICENSE.txt).
