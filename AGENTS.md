@@ -15,9 +15,10 @@ This is a small `net10.0` Razor component library. It is:
 
 It is not an application framework. Do not add application layouts, CSS
 frameworks, static images, JavaScript (except the documented `ReconnectModal`
-behavior module), service registration, router wrappers,
-HTTP middleware, SEO policy, authorization policy, or domain-specific copy
-without a separate, evidence-based design decision.
+behavior module and the `IFileDownloadService` JS interop module), service
+registration (except the documented, opt-in `AddFileDownload()`), router
+wrappers, HTTP middleware, SEO policy, authorization policy, or
+domain-specific copy without a separate, evidence-based design decision.
 
 `NotFoundView` is presentation only. It must never call
 `NavigationManager.NotFound()`, mutate `HttpResponse.StatusCode`, infer
@@ -30,11 +31,16 @@ src/SyntaxCircus.Blazor.Components/
   Components/Feedback/NotFoundView.razor  public not-found component
   Components/Feedback/ReconnectModal.razor public reconnect component and behavior module
   Components/Feedback/GlobalError*.razor  public recoverable error-boundary components
+  Interop/IFileDownloadService.cs          public file-download service contract
+  Interop/FileDownloadService.cs           JS interop implementation (imports wwwroot/fileDownload.js)
+  Interop/FileDownloadServiceCollectionExtensions.cs  AddFileDownload() DI registration
+  wwwroot/fileDownload.js                  JS module backing IFileDownloadService (static web asset)
   _Imports.razor                           library-wide Razor imports
   SyntaxCircus.Blazor.Components.csproj    package metadata and pack settings
 
 tests/SyntaxCircus.Blazor.Components.Tests/
   NotFoundViewTests.cs                     bUnit rendering contract tests
+  FileDownloadServiceTests.cs              bUnit JSInterop contract tests for IFileDownloadService
   SyntaxCircus.Blazor.Components.Tests.csproj
 
 README.md                                  consumer install/API/integration guide
@@ -62,8 +68,9 @@ commit. GitVersion is disabled only for NCrunch through
 
 ## Public API rules
 
-The namespace `SyntaxCircus.Blazor.Components.Feedback` and every public
-component parameter are consumer API.
+The namespaces `SyntaxCircus.Blazor.Components.Feedback` and
+`SyntaxCircus.Blazor.Components.Interop`, every public component parameter,
+and the public members of `IFileDownloadService` are consumer API.
 
 - Treat renames, removals, type changes, default changes, or changed slot
   precedence as breaking changes.
@@ -75,8 +82,12 @@ component parameter are consumer API.
   parameter solely to encode one application’s branding.
 - Require evidence from at least two concrete consumer styles before adding a
 new component or widening a component contract.
-- `ReconnectModal` is the one intentional JavaScript exception: its module is limited to
-  standard Blazor circuit reconnect/retry/resume behavior. Keep its visuals host-owned.
+- `ReconnectModal` and `IFileDownloadService` are the two intentional JavaScript/service
+  exceptions. `ReconnectModal`'s module is limited to standard Blazor circuit
+  reconnect/retry/resume behavior and keeps its visuals host-owned.
+  `IFileDownloadService`'s module (`wwwroot/fileDownload.js`) is limited to turning a
+  `DotNetStreamReference` into a client-side blob download; it must not gain unrelated
+  browser APIs, styling, or UI.
 
 When public output changes, update all of the following in the same change:
 
@@ -132,6 +143,10 @@ Tests use xUnit v3, Shouldly, and bUnit.
   semantic markup.
 - Use `ShouldContain`/`ShouldNotContain` in the existing style.
 - Add a test for every public rendering behavior added or changed.
+- `IFileDownloadService` is tested with bUnit's `JSInterop` mock (`BunitContext.JSInterop`),
+  not a real browser: set up the `fileDownload.js` module import with `SetupModule`, configure
+  the `downloadFile` invocation with `SetupVoid(...).SetVoidResult()`, and assert on it with
+  `VerifyInvoke`.
 - This package cannot prove a consuming application returns HTTP 404. Host
   applications need `WebApplicationFactory` or equivalent integration tests
   that request a nonexistent URL and assert both status and body.
