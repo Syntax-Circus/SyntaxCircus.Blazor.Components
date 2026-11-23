@@ -84,7 +84,8 @@ and the public members of `IFileDownloadService` are consumer API.
 new component or widening a component contract.
 - `ReconnectModal` and `IFileDownloadService` are the two intentional JavaScript/service
   exceptions. `ReconnectModal`'s module is limited to standard Blazor circuit
-  reconnect/retry/resume behavior and keeps its visuals host-owned.
+  reconnect/retry/resume behavior (plus the opt-in `DeferMessages` injection of default text into
+  empty regions) and keeps its visuals host-owned.
   `IFileDownloadService`'s module (`wwwroot/fileDownload.js`) is limited to turning a
   `DotNetStreamReference` into a client-side blob download; it must not gain unrelated
   browser APIs, styling, or UI.

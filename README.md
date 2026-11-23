@@ -127,6 +127,7 @@ The component deliberately supplies no visual CSS. Style `CssClass` and the stab
 | Parameter | Type | Default | Behavior |
 |---|---|---|---|
 | `CssClass` | `string` | `"syntax-circus-reconnect-modal"` | Class applied to the dialog. |
+| `DeferMessages` | `bool` | `false` | Keeps the built-in default messages and Retry/Resume labels out of the server-rendered HTML; the behavior module injects them client-side. See below. |
 | `LoadingContent` | `RenderFragment?` | `null` | Optional content shown during first and repeated reconnection attempts. |
 | `FirstAttemptContent` | `RenderFragment?` | `null` | Replaces the initial reconnect message. |
 | `RetryingContent` | `RenderFragment?` | `null` | Replaces the repeated-attempt message. Include `components-seconds-to-next-attempt` when showing the Blazor retry delay. |
@@ -136,7 +137,11 @@ The component deliberately supplies no visual CSS. Style `CssClass` and the stab
 | `RetryActionContent` | `RenderFragment?` | `null` | Replaces the retry action. Its interactive element must have `data-reconnect-action="retry"`. |
 | `ResumeActionContent` | `RenderFragment?` | `null` | Replaces the resume action in both paused states. Its interactive element must have `data-reconnect-action="resume"`. |
 
-Only one element with the `components-reconnect-modal` ID may exist in a rendered host. The component's JavaScript is limited to the standard Blazor circuit APIs and is loaded automatically with the component.
+Only one element with the `components-reconnect-modal` ID may exist in a rendered host. The component's JavaScript is limited to the standard Blazor circuit APIs (plus the `DeferMessages` DOM injection below) and is loaded automatically with the component.
+
+### Keeping messages out of initial HTML
+
+By default every state's English message ("Rejoin failed...", "The session has been paused by the server.", and so on) is part of the server-rendered HTML, so crawlers and view-source see error-looking text on every page. Set `DeferMessages="true"` to render the same dialog, `data-reconnect-state` regions, heading id and `data-reconnect-action` buttons with no default text. The module then injects the default English messages and Retry/Resume labels (including the `components-seconds-to-next-attempt` span) into the empty regions the first time the modal changes state, so users see identical text. Injection is idempotent. Content fragments you supply are still rendered server-side as given, so hosts that provide custom text own where it appears.
 
 ## Error boundaries
 

@@ -51,4 +51,76 @@ public sealed class ReconnectModalTests
         markup.ShouldNotContain(">Retry</button>");
         markup.ShouldNotContain(">Resume</button>");
     }
+
+    private static readonly string[] DefaultTexts =
+    [
+        "Rejoining the server",
+        "Rejoin failed",
+        "Trying again in",
+        "Failed to rejoin",
+        "The session has been paused",
+        "Failed to resume",
+        ">Retry<",
+        ">Resume<",
+    ];
+
+    [Fact]
+    public void Render_DefaultMode_ContainsNoDeferHooks()
+    {
+        using var context = new BunitContext();
+        var markup = context.Render<ReconnectModal>().Markup;
+
+        markup.ShouldNotContain("data-reconnect-default");
+        foreach (var text in DefaultTexts)
+        {
+            markup.ShouldContain(text);
+        }
+    }
+
+    [Fact]
+    public void Render_DeferMessages_OmitsDefaultTextButKeepsStructure()
+    {
+        using var context = new BunitContext();
+        var markup = context.Render<ReconnectModal>(parameters => parameters
+            .Add(component => component.DeferMessages, true)).Markup;
+
+        foreach (var text in DefaultTexts)
+        {
+            markup.ShouldNotContain(text);
+        }
+
+        foreach (var state in new[] { "first retrying", "first", "retrying", "failed", "paused", "resume-failed" })
+        {
+            markup.ShouldContain($"data-reconnect-state=\"{state}\"");
+        }
+
+        markup.ShouldContain("data-reconnect-action=\"retry\"");
+        markup.ShouldContain("data-reconnect-action=\"resume\"");
+        markup.ShouldContain("aria-labelledby=\"reconnect-");
+        markup.ShouldContain("id=\"reconnect-");
+        foreach (var key in new[] { "first", "retrying", "failed", "paused", "resume-failed", "retry-label", "resume-label" })
+        {
+            markup.ShouldContain($"data-reconnect-default=\"{key}\"");
+        }
+    }
+
+    [Fact]
+    public void Render_DeferMessages_StillRendersCustomFragments()
+    {
+        using var context = new BunitContext();
+        RenderFragment content = builder => builder.AddContent(0, "Custom content");
+        RenderFragment retryAction = builder => builder.AddMarkupContent(0, "<button data-reconnect-action=\"retry\">Try again</button>");
+
+        var markup = context.Render<ReconnectModal>(parameters => parameters
+            .Add(component => component.DeferMessages, true)
+            .Add(component => component.FirstAttemptContent, content)
+            .Add(component => component.RetryActionContent, retryAction))
+            .Markup;
+
+        markup.ShouldContain("Custom content");
+        markup.ShouldContain("Try again");
+        markup.ShouldNotContain("data-reconnect-default=\"first\"");
+        markup.ShouldNotContain("data-reconnect-default=\"retry-label\"");
+        markup.ShouldContain("data-reconnect-default=\"failed\"");
+    }
 }

@@ -16,7 +16,14 @@
         }
         else
         {
-            <p>Rejoining the server...</p>
+            @if (DeferMessages)
+            {
+                <p data-reconnect-default="first"></p>
+            }
+            else
+            {
+                <p>Rejoining the server...</p>
+            }
         }
     </div>
     <div data-reconnect-state="retrying">
@@ -26,7 +33,14 @@
         }
         else
         {
-            <p>Rejoin failed. Trying again in <span id="components-seconds-to-next-attempt"></span> seconds.</p>
+            @if (DeferMessages)
+            {
+                <p data-reconnect-default="retrying"></p>
+            }
+            else
+            {
+                <p>Rejoin failed. Trying again in <span id="components-seconds-to-next-attempt"></span> seconds.</p>
+            }
         }
     </div>
     <div data-reconnect-state="failed">
@@ -36,7 +50,14 @@
         }
         else
         {
-            <p>Failed to rejoin. Please retry or reload the page.</p>
+            @if (DeferMessages)
+            {
+                <p data-reconnect-default="failed"></p>
+            }
+            else
+            {
+                <p>Failed to rejoin. Please retry or reload the page.</p>
+            }
         }
 
         @if (RetryActionContent is not null)
@@ -45,7 +66,14 @@
         }
         else
         {
-            <button type="button" data-reconnect-action="retry">Retry</button>
+            @if (DeferMessages)
+            {
+                <button type="button" data-reconnect-action="retry" data-reconnect-default="retry-label"></button>
+            }
+            else
+            {
+                <button type="button" data-reconnect-action="retry">Retry</button>
+            }
         }
     </div>
     <div data-reconnect-state="paused">
@@ -55,7 +83,14 @@
         }
         else
         {
-            <p>The session has been paused by the server.</p>
+            @if (DeferMessages)
+            {
+                <p data-reconnect-default="paused"></p>
+            }
+            else
+            {
+                <p>The session has been paused by the server.</p>
+            }
         }
 
         @if (ResumeActionContent is not null)
@@ -64,7 +99,14 @@
         }
         else
         {
-            <button type="button" data-reconnect-action="resume">Resume</button>
+            @if (DeferMessages)
+            {
+                <button type="button" data-reconnect-action="resume" data-reconnect-default="resume-label"></button>
+            }
+            else
+            {
+                <button type="button" data-reconnect-action="resume">Resume</button>
+            }
         }
     </div>
     <div data-reconnect-state="resume-failed">
@@ -74,7 +116,14 @@
         }
         else
         {
-            <p>Failed to resume the session. Please retry or reload the page.</p>
+            @if (DeferMessages)
+            {
+                <p data-reconnect-default="resume-failed"></p>
+            }
+            else
+            {
+                <p>Failed to resume the session. Please retry or reload the page.</p>
+            }
         }
 
         @if (ResumeActionContent is not null)
@@ -83,7 +132,14 @@
         }
         else
         {
-            <button type="button" data-reconnect-action="resume">Resume</button>
+            @if (DeferMessages)
+            {
+                <button type="button" data-reconnect-action="resume" data-reconnect-default="resume-label"></button>
+            }
+            else
+            {
+                <button type="button" data-reconnect-action="resume">Resume</button>
+            }
         }
     </div>
 </dialog>
@@ -93,6 +149,14 @@
 
     [Parameter]
     public string CssClass { get; set; } = "syntax-circus-reconnect-modal";
+
+    /// <summary>
+    /// When true, the built-in default messages and action labels are not rendered in the
+    /// server-rendered HTML; the behavior module injects them client-side the first time the
+    /// modal is shown. Host-supplied content fragments are still rendered as given.
+    /// </summary>
+    [Parameter]
+    public bool DeferMessages { get; set; }
 
     [Parameter]
     public RenderFragment? LoadingContent { get; set; }

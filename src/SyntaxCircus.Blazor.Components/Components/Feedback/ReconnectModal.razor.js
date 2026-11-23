@@ -1,7 +1,38 @@
 const modal = document.getElementById("components-reconnect-modal");
 
 if (modal) {
+    // Default English text for DeferMessages mode. Mirrors the server-rendered defaults.
+    const defaults = {
+        "first": (el) => { el.textContent = "Rejoining the server..."; },
+        "retrying": (el) => {
+            el.append("Rejoin failed. Trying again in ");
+            const seconds = document.createElement("span");
+            seconds.id = "components-seconds-to-next-attempt";
+            el.append(seconds, " seconds.");
+        },
+        "failed": (el) => { el.textContent = "Failed to rejoin. Please retry or reload the page."; },
+        "paused": (el) => { el.textContent = "The session has been paused by the server."; },
+        "resume-failed": (el) => { el.textContent = "Failed to resume the session. Please retry or reload the page."; },
+        "retry-label": (el) => { el.textContent = "Retry"; },
+        "resume-label": (el) => { el.textContent = "Resume"; },
+    };
+
+    // Idempotent: only fills elements that are still empty and not yet filled.
+    const injectDefaults = () => {
+        modal.querySelectorAll("[data-reconnect-default]").forEach((element) => {
+            if (element.dataset.reconnectFilled || element.childNodes.length > 0) {
+                return;
+            }
+            const fill = defaults[element.dataset.reconnectDefault];
+            if (fill) {
+                fill(element);
+                element.dataset.reconnectFilled = "true";
+            }
+        });
+    };
+
     const setState = (state) => {
+        injectDefaults();
         modal.querySelectorAll("[data-reconnect-state]").forEach((element) => {
             element.hidden = !element.dataset.reconnectState.split(" ").includes(state);
         });
